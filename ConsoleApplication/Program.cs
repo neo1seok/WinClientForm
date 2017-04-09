@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using WindowsFormsRemote;
 
 namespace ConsoleApplication
 {
@@ -72,6 +73,31 @@ namespace ConsoleApplication
             classRemote.KeyDown(0x41);
             classRemote.KeyUp(0x41);
 
+            classRemote.SetSize(100,100);
+
+            int x = 10;
+            int y = 10;
+
+            for(int i = 0; i < 10; i++)
+            {
+                x++;
+                classRemote.MouseMove(x, y);
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                y++;
+                classRemote.MouseMove(x, y);
+            }
+            classRemote.KeyDown(0x41);
+            classRemote.KeyUp(0x41);
+            classRemote.MouseRigthDown(x,y);
+            classRemote.MouseRightUp(x,y);
+
+            // var tcphandler = new TcpClientHandler("192.168.0.3",5510);
+            var tcphandler = new TcpClientHandler();
+            tcphandler.Connect("192.168.0.3", 5510);
+            //tcphandler.Connect("localhost", 5510);
             //var fdsadf = 
             //    new ClassRemotePacket()
             //{
@@ -80,10 +106,21 @@ namespace ConsoleApplication
 
             //};
             //var fdsa  = JsonConvert.SerializeObject(fdsadf);
-            var fdsfdafs = classRemote.Invoke();
+            var fdsfdafs = classRemote.InputEvent();
             Console.WriteLine(fdsfdafs);
-            Connect("localhost", fdsfdafs);
-            
+           
+            while (true)
+            {
+                Console.WriteLine("any key");
+                ConsoleKeyInfo key = Console.ReadKey();
+                if (key.Key == ConsoleKey.Q) break;
+                tcphandler.Send(fdsfdafs);
+
+            }
+        
+    
+            tcphandler.Close();
+
         }
     }
 }

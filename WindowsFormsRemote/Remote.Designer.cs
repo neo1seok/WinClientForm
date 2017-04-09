@@ -28,18 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox_ip = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.buttonConnect = new System.Windows.Forms.Button();
+            this.conStatus = new System.Windows.Forms.TextBox();
+            this.results = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
-            // textBox1
+            // textBox_ip
             // 
-            this.textBox1.Location = new System.Drawing.Point(97, 43);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(227, 25);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.textBox_ip.Location = new System.Drawing.Point(97, 43);
+            this.textBox_ip.Name = "textBox_ip";
+            this.textBox_ip.Size = new System.Drawing.Size(227, 25);
+            this.textBox_ip.TabIndex = 0;
+           
             // 
             // label1
             // 
@@ -50,31 +52,48 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "주소";
             // 
-            // button1
+            // buttonConnect
             // 
-            this.button1.Location = new System.Drawing.Point(359, 43);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(137, 25);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "연결";
-            this.button1.UseVisualStyleBackColor = true;
+            this.buttonConnect.Location = new System.Drawing.Point(359, 43);
+            this.buttonConnect.Name = "buttonConnect";
+            this.buttonConnect.Size = new System.Drawing.Size(137, 25);
+            this.buttonConnect.TabIndex = 2;
+            this.buttonConnect.Text = "연결";
+            this.buttonConnect.UseVisualStyleBackColor = true;
+            this.buttonConnect.Click += new System.EventHandler(this.buttonConnect_Click);
+            // 
+            // conStatus
+            // 
+            this.conStatus.Location = new System.Drawing.Point(12, 419);
+            this.conStatus.Name = "conStatus";
+            this.conStatus.ReadOnly = true;
+            this.conStatus.Size = new System.Drawing.Size(749, 25);
+            this.conStatus.TabIndex = 3;
+            // 
+            // results
+            // 
+            this.results.FormattingEnabled = true;
+            this.results.ItemHeight = 15;
+            this.results.Location = new System.Drawing.Point(12, 115);
+            this.results.Name = "results";
+            this.results.Size = new System.Drawing.Size(749, 289);
+            this.results.TabIndex = 4;
             // 
             // Remote
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(707, 451);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(782, 456);
+            this.Controls.Add(this.results);
+            this.Controls.Add(this.conStatus);
+            this.Controls.Add(this.buttonConnect);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.textBox_ip);
             this.Name = "Remote";
             this.Text = "RemoteClient";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Remote_KeyDown);
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Remote_KeyPress);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Remote_KeyUp);
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Remote_MouseDown);
-            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Remote_MouseMove);
-            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Remote_MouseUp);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Remote_FormClosed);
+            this.Load += new System.EventHandler(this.Remote_Load);
+        
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -82,9 +101,11 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBox_ip;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonConnect;
+        private System.Windows.Forms.TextBox conStatus;
+        private System.Windows.Forms.ListBox results;
     }
 }
 

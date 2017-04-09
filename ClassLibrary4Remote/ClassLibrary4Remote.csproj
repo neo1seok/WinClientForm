@@ -48,6 +48,7 @@
     <Compile Include="ClassRemotePacket.cs" />
     <Compile Include="IRemote.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TcpClientHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

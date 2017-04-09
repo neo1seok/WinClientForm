@@ -158,22 +158,82 @@ namespace ClassLibrary4Remote
     //{0xC0 , "`"}
 
    };
+        enum EVNET{
+            MOVE,
+            LDOWN,
+            LUP,
+            RDOWN,
+            RUP,
+            KEYDOWN,
+            KEYUP,
 
-
-        IList<ClassRemotePacket> listRemote = new List<ClassRemotePacket>();
-        public void InputString(string input)
+        }
+        struct POINT
         {
-            listRemote.Add(new ClassRemotePacket()
-            {
-                cmd = "input_string",
-                values = new List<object>() { input, "" }
+            public  EVNET @event;
+            public int x;
+            public int y;
+            public int vkey;
+            //public int delay;
+         }
+        struct SIZE
+        {
+            public int dx;
+            public int dy;
+        }
+        IList<ClassRemotePacket> listRemote = new List<ClassRemotePacket>();
 
-            });
+        Queue<POINT> quemoue = new Queue<POINT>();
+        SIZE screensize = new SIZE();
+
+        public string InputString(string input)
+        {
+           var classRemotePacket = new ClassRemotePacket(){cmd = "input_string"};
+            classRemotePacket.add_value(input, "");
+            listRemote.Add(classRemotePacket);
+            string ret = JsonConvert.SerializeObject(listRemote);
+
+            return ret;
 
         }
 
-        public string Invoke()
+        public string InputEvent()
         {
+
+            var classRemotePacket = new ClassRemotePacket() { cmd = "set_size" };
+            classRemotePacket.add_value(this.screensize.dx, this.screensize.dy);
+            listRemote.Add(classRemotePacket);
+
+            if (quemoue.ToList().Count > 0)
+            {
+                
+
+
+                classRemotePacket = new ClassRemotePacket() { cmd = "input_event" };
+
+                quemoue.ToList().ForEach(n => {
+                    switch(n.@event)
+                    {
+                        case EVNET.KEYDOWN:
+                        case EVNET.KEYUP:
+                            classRemotePacket.add_value(n.@event.ToString().ToLower(), VK_CODE[n.vkey]);
+                            break;
+                         default:
+                            classRemotePacket.add_value(n.@event.ToString().ToLower(), n.x, n.y);
+                            break;
+                    }
+
+                    
+                    
+                });
+                listRemote.Add(classRemotePacket);
+                quemoue.Clear();
+
+
+
+            }
+
+        
             string ret = JsonConvert.SerializeObject(listRemote);
             listRemote.Clear();
             return ret;
@@ -181,73 +241,165 @@ namespace ClassLibrary4Remote
         
         public void KeyDown(int vk_key)
         {
-            listRemote.Add(new ClassRemotePacket()
+            quemoue.Enqueue(new POINT()
             {
-                cmd = "kbd_event",
-                values = new List<object>() { VK_CODE[vk_key], "down"}
+                @event = EVNET.KEYDOWN,
+                vkey = vk_key
+                
 
             });
+            //var classRemotePacket = new ClassRemotePacket() { cmd = "kbd_event" };
+            //classRemotePacket.add_value(VK_CODE[vk_key], "down");
+
+            //listRemote.Add(classRemotePacket);
+            //listRemote.Add(new ClassRemotePacket()
+            //{
+            //    cmd = "kbd_event",
+            //    values = new List<object>() { VK_CODE[vk_key], "down"}
+
+            //});
         }
 
         public void KeyUp(int vk_key)
         {
-            listRemote.Add(new ClassRemotePacket()
+            quemoue.Enqueue(new POINT()
             {
-                cmd = "kbd_event",
-                values = new List<object>() { VK_CODE[vk_key], "up" }
+                @event = EVNET.KEYUP,
+                vkey = vk_key
+
 
             });
+
+            //var classRemotePacket = new ClassRemotePacket() { cmd = "kbd_event" };
+            //classRemotePacket.add_value(VK_CODE[vk_key], "up");
+            //listRemote.Add(classRemotePacket);
+            //listRemote.Add(new ClassRemotePacket()
+            //{
+            //    cmd = "kbd_event",
+            //    values = new List<object>() { VK_CODE[vk_key], "up" }
+
+            //});
         }
 
-        public void MouseDown()
+        public void MouseLeftDown(int x, int y)
         {
-            listRemote.Add(new ClassRemotePacket()
+            quemoue.Enqueue(new POINT()
             {
-                cmd = "mouse_event",
-                values = new List<object>() { "left", "down" }
+                @event = EVNET.LDOWN,
+                x = x,
+                y = y,
+       //         delay = 0
 
             });
+
+            //listRemote.Add(new ClassRemotePacket()
+            //{
+            //    cmd = "mouse_event",
+            //    values = new List<object>() { "left", "down" }
+
+            //});
         }
 
        
 
         public void MouseMove(int x, int y)
         {
-            listRemote.Add(new ClassRemotePacket()
-            {
-                cmd = "mouse_move",
-                values = new List<object>() {x,y }
 
+            quemoue.Enqueue(new POINT() {
+                @event = EVNET.MOVE,
+                x = x,
+                y = y,
+        //        delay = delay
             });
-        }
+            //listRemote.Add(new ClassRemotePacket()
+            //{
+            //    cmd = "mouse_move",
+            //    values = new List<object>() {x,y }
 
-        public void MouseUp()
+            //});
+        }
+        public void SetSize(int width,int height)
         {
-            listRemote.Add(new ClassRemotePacket()
-            {
-                cmd = "mouse_event",
-                values = new List<object>() { "left", "up" }
+            screensize.dx = width;
+            screensize.dy = height;
 
-            });
         }
-        public void MouseRigthDown()
+        public void MouseMoveAbs(int x, int y,int width,int height)
         {
-            listRemote.Add(new ClassRemotePacket()
-            {
-                cmd = "mouse_event",
-                values = new List<object>() { "right", "down" }
+            //listRemote.Add(new ClassRemotePacket()
+            //{
+            //    cmd = "mouse_move_abs",
+            //    values = new List<object>() { x, y , width , height }
 
-            });
+            //});
         }
-
-        public void MouseRightUp()
+        public void MouseLeftUp(int x, int y)
         {
-            listRemote.Add(new ClassRemotePacket()
+            quemoue.Enqueue(new POINT()
             {
-                cmd = "mouse_event",
-                values = new List<object>() { "right", "up" }
+                @event = EVNET.LDOWN,
+                x = x,
+                y = y,
+              //  delay = 0
 
             });
+            //listRemote.Add(new ClassRemotePacket()
+            //{
+            //    cmd = "mouse_event",
+            //    values = new List<object>() { "left", "up" }
+
+            //});
         }
+        public void MouseRigthDown(int x, int y)
+        {
+            quemoue.Enqueue(new POINT()
+            {
+                @event = EVNET.RDOWN,
+                x = x,
+                y = y,
+                //delay = 0
+
+            });
+            //listRemote.Add(new ClassRemotePacket()
+            //{
+            //    cmd = "mouse_event",
+            //    values = new List<object>() { "right", "down" }
+
+            //});
+        }
+
+        public void MouseRightUp(int x, int y)
+        {
+            quemoue.Enqueue(new POINT()
+            {
+                @event = EVNET.RUP,
+                x = x,
+                y = y,
+                //delay = 0
+
+            });
+            //listRemote.Add(new ClassRemotePacket()
+            //{
+            //    cmd = "mouse_event",
+            //    values = new List<object>() { "right", "up" }
+
+            //});
+        }
+        public int Count
+        {
+            get
+            {
+                return listRemote.Count;
+            }
+        }
+        public bool IS_INPUTQUE
+        {
+            get
+            {
+                if (quemoue.Count > 0) return true;
+                return false;
+            }            
+        }
+
     }
 }

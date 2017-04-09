@@ -6,17 +6,22 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary4Remote
 {
-    interface IRemote
+    public interface IRemote
     {
-        void MouseDown();
-        void MouseUp();
-        void MouseRigthDown();
-        void MouseRightUp();
+        void SetSize(int width, int height);
+        void MouseLeftDown(int x, int y);
+        void MouseLeftUp(int x, int y);
+        void MouseRigthDown(int x, int y);
+        void MouseRightUp(int x, int y);
         void MouseMove(int x, int y);
-       
+        void MouseMoveAbs(int x, int y, int width, int height);
+
+
         void KeyDown(int vk_key);
         void KeyUp(int vk_key);
-        void InputString(string  input);
-        string Invoke();
+        string InputString(string  input);
+        string InputEvent();
+        bool IS_INPUTQUE { get; }
+        //  int Count { get; }
     }
 }
