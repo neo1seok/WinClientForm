@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace ClassLibrary4Remote
 {
     public class ClassRemote : IRemote
     {
-        Dictionary<int, string>      VK_CODE = new Dictionary<Int32, string>(){
+        protected Dictionary<int, string>      VK_CODE = new Dictionary<Int32, string>(){
                 {0x08 , "backspace"},
     {0x09 , "tab"},
     {0x0C , "clear"},
@@ -158,7 +159,24 @@ namespace ClassLibrary4Remote
     //{0xC0 , "`"}
 
    };
-        enum EVNET{
+
+        Dictionary<string, int> map_cmd = new Dictionary<string, int>()
+            {
+
+                { "start_event",0x20},
+                { "end_event",0x21},
+                { "move",0x10},
+                { "ldown",0x11},
+                { "lup",0x12},
+                { "rdown",0x13},
+                { "rup",0x14},
+                { "keydown",0x15},
+                { "keyup",0x16},
+                { "input_string",0x17},
+            };
+
+        protected enum EVNET
+        {
             MOVE,
             LDOWN,
             LUP,
@@ -168,7 +186,7 @@ namespace ClassLibrary4Remote
             KEYUP,
 
         }
-        struct POINT
+        protected struct POINT
         {
             public  EVNET @event;
             public int x;
@@ -176,15 +194,15 @@ namespace ClassLibrary4Remote
             public int vkey;
             //public int delay;
          }
-        struct SIZE
+        protected struct SIZE
         {
             public int dx;
             public int dy;
         }
-        IList<ClassRemotePacket> listRemote = new List<ClassRemotePacket>();
+        protected IList<ClassRemotePacket> listRemote = new List<ClassRemotePacket>();
 
-        Queue<POINT> quemoue = new Queue<POINT>();
-        SIZE screensize = new SIZE();
+        protected Queue<POINT> quemoue = new Queue<POINT>();
+        protected SIZE screensize = new SIZE();
 
         public string InputString(string input)
         {
@@ -378,13 +396,14 @@ namespace ClassLibrary4Remote
                 //delay = 0
 
             });
-            //listRemote.Add(new ClassRemotePacket()
-            //{
-            //    cmd = "mouse_event",
-            //    values = new List<object>() { "right", "up" }
-
-            //});
+   
         }
+
+        public byte[] InputEventBytes()
+        {
+            return new byte[0];
+        }
+
         public int Count
         {
             get
@@ -400,6 +419,54 @@ namespace ClassLibrary4Remote
                 return false;
             }            
         }
+        byte [] conv_short_to_bytes(short input)
+        {
+            byte [] ret = BitConverter.GetBytes(input);
+            Array.Reverse(ret);
+            return ret;
+
+        }
+        public byte [] make_buff(string cmd_name, short p1, short p2, byte [] value= null)
+        {
+
+            List<byte> sndbuff = new List<byte>();
+
+            if (value == null) value = new byte[0];
+
+            int cmd = map_cmd[cmd_name];
+            short length =(short) value.Length;
+
+
+            //sndbuff = b'\x02'
+            sndbuff.Add(0x02);
+
+            //sndbuff += cmd.to_bytes(1, 'big');
+            sndbuff.Add((byte)cmd);
+
+
+            //sndbuff += conv_short_to_bytes(p1)
+            sndbuff.AddRange(conv_short_to_bytes(p1));
+
+
+            //sndbuff += conv_short_to_bytes(p2)
+            sndbuff.AddRange(conv_short_to_bytes(p2));
+
+
+            //sndbuff += conv_short_to_bytes(length)
+            sndbuff.AddRange(conv_short_to_bytes(length));
+
+            //sndbuff += value
+            sndbuff.AddRange(value);
+
+            //sndbuff += b'\x03'
+            sndbuff.Add(0x03);
+
+            return sndbuff.ToArray();
+
+
+        }
+	
+	
 
     }
 }

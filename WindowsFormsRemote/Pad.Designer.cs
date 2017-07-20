@@ -38,11 +38,11 @@
             // 
             this.textBoxStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxStatus.Location = new System.Drawing.Point(12, 159);
+            this.textBoxStatus.Location = new System.Drawing.Point(12, 247);
             this.textBoxStatus.Multiline = true;
             this.textBoxStatus.Name = "textBoxStatus";
             this.textBoxStatus.ReadOnly = true;
-            this.textBoxStatus.Size = new System.Drawing.Size(360, 26);
+            this.textBoxStatus.Size = new System.Drawing.Size(473, 26);
             this.textBoxStatus.TabIndex = 0;
             this.textBoxStatus.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
@@ -53,9 +53,13 @@
             // 
             // panel
             // 
-            this.panel.Location = new System.Drawing.Point(0, 0);
+            this.panel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.panel.Location = new System.Drawing.Point(6, 12);
             this.panel.Name = "panel";
-            this.panel.Size = new System.Drawing.Size(372, 153);
+            this.panel.Size = new System.Drawing.Size(479, 229);
             this.panel.TabIndex = 1;
             this.panel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel_MouseDown);
             this.panel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel_MouseMove);
@@ -65,7 +69,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 197);
+            this.ClientSize = new System.Drawing.Size(497, 285);
             this.Controls.Add(this.panel);
             this.Controls.Add(this.textBoxStatus);
             this.MaximizeBox = false;

@@ -21,6 +21,7 @@ namespace ClassLibrary4Remote
         void KeyUp(int vk_key);
         string InputString(string  input);
         string InputEvent();
+        byte[] InputEventBytes();
         bool IS_INPUTQUE { get; }
         //  int Count { get; }
     }

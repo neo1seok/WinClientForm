@@ -20,8 +20,9 @@ namespace WindowsFormsRemote
         private byte[] data = new byte[1024];
         private int size = 1024;
         Pad pad ;
-        TcpClientHandler tcpHandler;
+        //TcpClientHandler tcpHandler;
         TcpClient tcpclient;
+        UdpClient udpClient;
         IAsyncResult asyncRes;
         Action<string> work;
         object obj = new object();
@@ -29,8 +30,9 @@ namespace WindowsFormsRemote
         public Remote()
         {
             InitializeComponent();
-            tcpHandler = new TcpClientHandler();
-            tcpHandler.SetStateFuncion(cbstatu);
+            //tcpHandler = new TcpClientHandler();
+            //tcpHandler.SetStateFuncion(cbstatu);
+            
             work = ShowDlg;
       
         }
@@ -39,23 +41,28 @@ namespace WindowsFormsRemote
 
         private void buttonConnect_Click(object sender, EventArgs e)
         {
-            tcpHandler.Connect(textBox_ip.Text,5510);
+            // tcpHandler.Connect(textBox_ip.Text,5510);
+            udpClient = new UdpClient();
+            udpClient.Connect(textBox_ip.Text, 5510);
+            conStatus.Text = "Connected";
+            asyncRes = work.BeginInvoke("", null, null);
             //return;
             //conStatus.Text = "Connecting...";
             //Socket newsock = new Socket(AddressFamily.InterNetwork,
             //                      SocketType.Stream, ProtocolType.Tcp);
-            
+
             //IPEndPoint iep = new IPEndPoint(IPAddress.Parse(textBox_ip.Text), 5510);
             //newsock.BeginConnect(iep, new AsyncCallback(Connected), newsock);
-        
+
 
         }
      
-        public void SendToServer(string msg)
+        public void SendToServer(byte[] buffer)
         {
+            udpClient.Send(buffer, buffer.Length);
             //lock (obj)
             {
-                tcpHandler.Send(msg);
+                //tcpHandler.Send(msg);
             }
             this.Invoke((MethodInvoker)delegate {
                 
@@ -205,8 +212,9 @@ namespace WindowsFormsRemote
         {
             try
             {
-                tcpHandler.ResetSetStateFuncion();
-                tcpHandler.Close();
+                udpClient.Close();
+                //tcpHandler.ResetSetStateFuncion();
+                //tcpHandler.Close();
             }
             catch (Exception)
             {

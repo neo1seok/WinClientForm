@@ -126,7 +126,8 @@ namespace WindowsFormsRemote
 
             if (!irmote.IS_INPUTQUE ) return;
             if(lastmove.X >= 0) irmote.MouseMove(lastmove.X, lastmove.Y);
-            string sndbuff = irmote.InputEvent();
+            byte[] sndbuff = irmote.InputEventBytes();
+           // string sndbuff = irmote.InputEvent();
             textBoxStatus.Text += string.Format("{0}\r\n", sndbuff);
             main.SendToServer(sndbuff);
             sw.Reset();
