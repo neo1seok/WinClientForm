@@ -204,7 +204,7 @@ namespace WindowsFormsRemote
         {
             pad = new Pad(this);
             this.textBox_ip.Text = "192.168.0.3";
-            //this.textBox_ip.Text = "localhost";
+            this.textBox_ip.Text = "localhost";
 
         }
 

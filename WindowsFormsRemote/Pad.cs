@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,7 +15,8 @@ namespace WindowsFormsRemote
 {
     public partial class Pad : Form
     {
-        IRemote irmote = new ClassRemote();
+		bool isStart = false;
+		IRemote irmote = new ClassRemoteUDP();
         Remote main;
         Stopwatch sw = new Stopwatch();
         Point lastmove = new Point();
@@ -26,8 +28,7 @@ namespace WindowsFormsRemote
             InitializeComponent();
             this.Focus();
             this.main = main;
-            irmote.SetSize(panel.Size.Width, panel.Size.Height);
-
+            
             
            // textBoxStatus.Hide();
         }
@@ -85,11 +86,13 @@ namespace WindowsFormsRemote
             //    textBoxStatus.Text = "ProcessCmdKey key down\r\n";
             //    return true;
             //}
-            
+			System.Diagnostics.Debug.WriteLine("ProcessCmdKey");
             int vkkey = 0;
             int.TryParse(msg.WParam.ToString(), out vkkey);
-            textBoxStatus.Text = string.Format("ProcessCmdKey key down {0} ", keyData.ToString());
+			//#textBoxStatus.Text = string.Format("ProcessCmdKey key down {0} ", keyData.ToString());
             irmote.KeyDown(vkkey);
+//#SendPost();
+//			Thread.Sleep(10);
             irmote.KeyUp(vkkey);
             SendPost();
 
@@ -110,18 +113,40 @@ namespace WindowsFormsRemote
         private void Pad_Load(object sender, EventArgs e)
         {
 
-            this.timerInvoke.Start();
+			//this.timerInvoke.Start();
+			
         }
         void SendPost()
         {
-            this.timerInvoke.Stop();
-            this.timerInvoke.Start();
+			while (irmote.IS_INPUTQUE)
+			{
+				byte[] sndbuff = irmote.InputEventBytes();
+				if (sndbuff == null)
+				{
+					int asd = 0;
+				}
+				if (!isStart) continue;
+
+
+				// string sndbuff = irmote.InputEvent();
+				string status = string.Format("irmote.STATUS:{0}", irmote.STATUS);
+				textBoxStatus.Text = string.Format("irmote.STATUS:{0}\r\n", irmote.STATUS);
+				main.SendToServer(sndbuff);
+
+				System.Diagnostics.Debug.WriteLine(status);
+				//this.timerInvoke.Stop();
+
+			}
+
+			
+			//this.timerInvoke.Start();
            
           
 
         }
         private void timerInvoke_Tick(object sender, EventArgs e)
         {
+			return;
             this.timerInvoke.Stop();
 
             if (!irmote.IS_INPUTQUE ) return;
@@ -137,36 +162,18 @@ namespace WindowsFormsRemote
 
         private void panel_MouseMove(object sender, MouseEventArgs e)
         {
-            ;
-            ;
-            lastmove.X = e.X;
-            lastmove.Y = e.Y;
 
-            textBoxStatus.Text = string.Format("Pad_MouseMove {0} {1} {2} {3}\r\n", e.X, e.Y, panel.Size.Width, panel.Size.Height);
-            int result = Environment.TickCount & Int32.MaxValue;
-            
-
-            //sw.Stop();
-            if(result - this.curtick > 10 || this.repeat>10)
-            {
-                this.repeat = 0;
-                irmote.MouseMove(e.X, e.Y);
-
-
-            }else
-            {
-                this.repeat++;
-            }
-            this.curtick = Environment.TickCount & Int32.MaxValue;
-
-
+			//textBoxStatus.Text = string.Format("Pad_MouseMove {0} {1} {2} {3}\r\n", e.X, e.Y, panel.Size.Width, panel.Size.Height);
+			//int result = Environment.TickCount & Int32.MaxValue;
+			irmote.MouseMove(e.X, e.Y);
             SendPost();
         }
 
         private void panel_MouseDown(object sender, MouseEventArgs e)
         {
            
-            textBoxStatus.Text = "MouseDown\r\n";
+            //textBoxStatus.Text = "MouseDown\r\n";
+			System.Diagnostics.Debug.WriteLine("MouseDown");
             if(e.Button == MouseButtons.Left)
                 irmote.MouseLeftDown(e.X, e.Y);
             else
@@ -176,15 +183,39 @@ namespace WindowsFormsRemote
 
         private void panel_MouseUp(object sender, MouseEventArgs e)
         {
-            
-            textBoxStatus.Text = "MouseUp\r\n";
-            irmote.MouseLeftUp(e.X, e.Y);
+			System.Diagnostics.Debug.WriteLine("MouseUp");
+            //textBoxStatus.Text = "MouseUp\r\n";
+            //irmote.MouseLeftUp(e.X, e.Y);
             if (e.Button == MouseButtons.Left)
                 irmote.MouseLeftUp(e.X, e.Y);
             else
                 irmote.MouseRightUp(e.X, e.Y);
             SendPost();
         }
+
+		private void button_toggle_Click(object sender, EventArgs e)
+		{
+			if (!isStart)
+			{
+				isStart = true;
+				irmote.SetSize(panel.Size.Width, panel.Size.Height);
+				SendPost();
+				this.button_toggle.Text = "정지";
+			}
+			else
+			{
+				isStart = false;
+				this.button_toggle.Text = "시작";
+
+			}
+			
+		}
+
+		private void btn_center_Click(object sender, EventArgs e)
+		{
+			irmote.MouseMove(panel.Size.Width/2, panel.Size.Height/2);
+			SendPost();
+		}
         //protected override bool IsInputKey(Keys keyData)
         //{
         //    if (keyData == Keys.Right)
