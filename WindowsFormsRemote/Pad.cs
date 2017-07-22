@@ -97,7 +97,7 @@ namespace WindowsFormsRemote
             SendPost();
 
 
-
+            return true;
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
@@ -116,6 +116,10 @@ namespace WindowsFormsRemote
 			//this.timerInvoke.Start();
 			
         }
+        
+
+
+        
         void SendPost()
         {
 			while (irmote.IS_INPUTQUE)
@@ -192,8 +196,39 @@ namespace WindowsFormsRemote
                 irmote.MouseRightUp(e.X, e.Y);
             SendPost();
         }
+        private void pane_MouseWheel(object sender, MouseEventArgs e)
+        {
+            bool IsReduce = true;
 
-		private void button_toggle_Click(object sender, EventArgs e)
+            // 휠을 아래로 내리면
+            // 축소(Reduce)가 아닌 확대(Expand) 이므로 false 대입
+            if (e.Delta < 0)
+            {
+                IsReduce = false;
+            }
+            System.Diagnostics.Debug.WriteLine(string.Format("pane_MouseWheel {0}", e.Delta));
+
+            irmote.MouseWheel(e.Delta);
+            SendPost();
+
+            /* 셀의 크기가 셀의 한계 범위 안에 든다면
+            * ->  MinCellSize < 셀 사이즈 < MaxCellSize
+            * ResizeCellSize함수는 셀의 크기를 1씩 증가 혹은 감소 하고
+            * true를 리턴한다.
+            * 하지만, 셀 사이즈가 한계 크기와 같다면
+            * 셀 크기에는 변동이 없고 false를 리턴
+            * 리턴값이 true라면 화면을 다시 그린다.
+            */
+            //if (MainBoard.ResizeCellSize(IsReduce) == true)
+            //{
+            //    // 가로, 세로 셀의 개수를 다시 계산
+            //    MainBoard.CalcCellNum();
+            //    // 메인보드 다시 그림
+            //    this.Invalidate();
+            //}
+        }
+
+        private void button_toggle_Click(object sender, EventArgs e)
 		{
 			if (!isStart)
 			{
@@ -214,8 +249,17 @@ namespace WindowsFormsRemote
 		private void btn_center_Click(object sender, EventArgs e)
 		{
 			irmote.MouseMove(panel.Size.Width/2, panel.Size.Height/2);
-			SendPost();
-		}
+            byte[] sndbuff = irmote.InputEventBytes();
+                // string sndbuff = irmote.InputEvent();
+            string status = string.Format("irmote.STATUS:{0}", irmote.STATUS);
+            textBoxStatus.Text = string.Format("irmote.STATUS:{0}\r\n", irmote.STATUS);
+            main.SendToServer(sndbuff);
+        }
+
+        private void Pad_Scroll(object sender, ScrollEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Pad_Scroll");
+        }
         //protected override bool IsInputKey(Keys keyData)
         //{
         //    if (keyData == Keys.Right)

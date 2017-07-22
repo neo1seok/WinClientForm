@@ -174,13 +174,14 @@ namespace ClassLibrary4Remote
             KEYDOWN,
             KEYUP,
 			INPUT_STR,
-
+            WHEEL,
         }
         protected struct POINT
         {
             public  EVNET @event;
             public int x;
             public int y;
+            public int delta;
             public int vkey;
 			public string values;
             //public int delay;
@@ -400,6 +401,11 @@ namespace ClassLibrary4Remote
 		virtual public byte[] InputEventBytes()
         {
             return new byte[0];
+        }
+
+        virtual public void MouseWheel(int delta)
+        {
+            throw new NotImplementedException();
         }
 
         public int Count

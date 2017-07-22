@@ -23,6 +23,7 @@ namespace ClassLibrary4Remote
 			{EVNET.KEYDOWN,0x15},
 			{EVNET.KEYUP,0x16},
 			{EVNET.INPUT_STR,0x17},
+            {EVNET.WHEEL,0x18},
 
             };
 		
@@ -40,7 +41,19 @@ namespace ClassLibrary4Remote
           
 
         }
-		override public void SetSize(int width, int height)
+        override public void MouseWheel(int delta)
+        {
+            quemoue.Enqueue(new POINT()
+            {
+                @event = EVNET.WHEEL,
+                delta = delta,
+                //  delay = 0
+
+            });
+
+         
+        }
+        override public void SetSize(int width, int height)
 		{
 			screensize.dx = width;
 			screensize.dy = height;
@@ -69,6 +82,9 @@ namespace ClassLibrary4Remote
 
 			switch (point.@event)
 			{
+                case EVNET.WHEEL:
+                    p1 = (short)point.delta;
+                    break;
 				case EVNET.KEYDOWN:
 				case EVNET.KEYUP:
 					p1 = (short)point.vkey;

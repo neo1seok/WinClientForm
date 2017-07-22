@@ -14,6 +14,7 @@ namespace ClassLibrary4Remote
         void MouseRigthDown(int x, int y);
         void MouseRightUp(int x, int y);
         void MouseMove(int x, int y);
+        void MouseWheel(int delta);
         void MouseMoveAbs(int x, int y, int width, int height);
 
 
