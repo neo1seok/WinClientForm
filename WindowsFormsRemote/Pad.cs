@@ -6,6 +6,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,17 +18,18 @@ namespace WindowsFormsRemote
     {
 		bool isStart = false;
 		IRemote irmote = new ClassRemoteUDP();
-        Remote main;
+       // Remote main;
         Stopwatch sw = new Stopwatch();
         Point lastmove = new Point();
         private int curtick;
         private int repeat;
+        UdpClient udpClient;
 
-        public Pad(Remote main)
+        public Pad(/*Remote main*/)
         {
             InitializeComponent();
             this.Focus();
-            this.main = main;
+           // this.main = main;
             
             
            // textBoxStatus.Hide();
@@ -72,6 +74,7 @@ namespace WindowsFormsRemote
         }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            return base.ProcessCmdKey(ref msg, keyData);
             //if (keyData == Keys.Up)
             //{
             //    // Handle key at form level.
@@ -86,7 +89,7 @@ namespace WindowsFormsRemote
             //    textBoxStatus.Text = "ProcessCmdKey key down\r\n";
             //    return true;
             //}
-			System.Diagnostics.Debug.WriteLine("ProcessCmdKey");
+            System.Diagnostics.Debug.WriteLine("ProcessCmdKey");
             int vkkey = 0;
             int.TryParse(msg.WParam.ToString(), out vkkey);
 			//#textBoxStatus.Text = string.Format("ProcessCmdKey key down {0} ", keyData.ToString());
@@ -113,15 +116,17 @@ namespace WindowsFormsRemote
         private void Pad_Load(object sender, EventArgs e)
         {
 
-			//this.timerInvoke.Start();
-			
+            //this.timerInvoke.Start();
+            this.textBox_ip.Text = "192.168.0.3";
+
         }
-        
 
 
+        int index = 0;
         
-        void SendPost()
+        void SendPost(bool isForceSend =false)
         {
+
 			while (irmote.IS_INPUTQUE)
 			{
 				byte[] sndbuff = irmote.InputEventBytes();
@@ -129,15 +134,16 @@ namespace WindowsFormsRemote
 				{
 					int asd = 0;
 				}
-				if (!isStart) continue;
+				if (!isForceSend && !isStart) continue;
 
 
 				// string sndbuff = irmote.InputEvent();
 				string status = string.Format("irmote.STATUS:{0}", irmote.STATUS);
-				textBoxStatus.Text = string.Format("irmote.STATUS:{0}\r\n", irmote.STATUS);
-				main.SendToServer(sndbuff);
+				textBoxStatus.Text = string.Format("{1} irmote.STATUS:{0}\r\n", irmote.STATUS, index++);
+				//SendToServer(sndbuff);
+                udpClient.Send(sndbuff, sndbuff.Length);
 
-				System.Diagnostics.Debug.WriteLine(status);
+                System.Diagnostics.Debug.WriteLine(status);
 				//this.timerInvoke.Stop();
 
 			}
@@ -151,16 +157,16 @@ namespace WindowsFormsRemote
         private void timerInvoke_Tick(object sender, EventArgs e)
         {
 			return;
-            this.timerInvoke.Stop();
+           // this.timerInvoke.Stop();
 
-            if (!irmote.IS_INPUTQUE ) return;
-            if(lastmove.X >= 0) irmote.MouseMove(lastmove.X, lastmove.Y);
-            byte[] sndbuff = irmote.InputEventBytes();
-           // string sndbuff = irmote.InputEvent();
-            textBoxStatus.Text += string.Format("{0}\r\n", sndbuff);
-            main.SendToServer(sndbuff);
-            sw.Reset();
-            this.repeat = 0;
+           // if (!irmote.IS_INPUTQUE ) return;
+           // if(lastmove.X >= 0) irmote.MouseMove(lastmove.X, lastmove.Y);
+           // byte[] sndbuff = irmote.InputEventBytes();
+           //// string sndbuff = irmote.InputEvent();
+           // textBoxStatus.Text += string.Format("{0}\r\n", sndbuff);
+           // main.SendToServer(sndbuff);
+           // sw.Reset();
+           // this.repeat = 0;
          
         }
 
@@ -232,10 +238,14 @@ namespace WindowsFormsRemote
 		{
 			if (!isStart)
 			{
-				isStart = true;
+                udpClient = new UdpClient();
+                udpClient.Connect(textBox_ip.Text, 5510);
+
+                isStart = true;
 				irmote.SetSize(panel.Size.Width, panel.Size.Height);
 				SendPost();
-				this.button_toggle.Text = "정지";
+           
+                this.button_toggle.Text = "정지";
 			}
 			else
 			{
@@ -248,17 +258,74 @@ namespace WindowsFormsRemote
 
 		private void btn_center_Click(object sender, EventArgs e)
 		{
-			irmote.MouseMove(panel.Size.Width/2, panel.Size.Height/2);
-            byte[] sndbuff = irmote.InputEventBytes();
-                // string sndbuff = irmote.InputEvent();
-            string status = string.Format("irmote.STATUS:{0}", irmote.STATUS);
-            textBoxStatus.Text = string.Format("irmote.STATUS:{0}\r\n", irmote.STATUS);
-            main.SendToServer(sndbuff);
+            udpClient = new UdpClient();
+            udpClient.Connect(textBox_ip.Text, 5510);
+            irmote.SetSize(panel.Size.Width, panel.Size.Height);
+            irmote.MouseMove(panel.Size.Width/2, panel.Size.Height/2);
+            SendPost(true);
+            //byte[] sndbuff = irmote.InputEventBytes();
+            //    // string sndbuff = irmote.InputEvent();
+            //string status = string.Format("irmote.STATUS:{0}", irmote.STATUS);
+            //textBoxStatus.Text = string.Format("irmote.STATUS:{0}\r\n", irmote.STATUS);
+            //SendToServer(sndbuff);
         }
 
         private void Pad_Scroll(object sender, ScrollEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("Pad_Scroll");
+        }
+
+        private void panel_SizeChanged(object sender, EventArgs e)
+        {
+            irmote.SetSize(panel.Size.Width, panel.Size.Height);
+            SendPost();
+            System.Diagnostics.Debug.WriteLine("panel_SizeChanged");
+
+        }
+        //public void SendToServer(byte[] buffer)
+        //{
+          
+        //    //lock (obj)
+        //    {
+        //        //tcpHandler.Send(msg);
+        //    }
+        //    this.Invoke((MethodInvoker)delegate {
+
+
+        //        //return;
+        //        //byte[] message = Encoding.UTF8.GetBytes(msg);
+
+        //        //client.BeginSend(message, 0, message.Length, SocketFlags.None,
+        //        //             new AsyncCallback(SendData), client);
+        //        //this.Invoke((MethodInvoker)delegate
+        //        //{
+        //        //    conStatus.Text = "Sendig : " + msg;
+        //        //});
+        //    });
+
+        //}
+
+        private void panel_KeyDown(object sender, KeyEventArgs e)
+        {
+            irmote.KeyDown(e.KeyValue);
+            SendPost();
+            System.Diagnostics.Debug.WriteLine("panel_KeyDown {0} {1:X}", e.KeyCode, e.KeyValue);
+         
+
+        }
+
+        private void panel_KeyUp(object sender, KeyEventArgs e)
+        {
+        
+            irmote.KeyUp(e.KeyValue);
+            SendPost();
+            System.Diagnostics.Debug.WriteLine("panel_KeyUp {0} {1:X}", e.KeyCode, e.KeyValue);
+        }
+
+        private void panel_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("panel_KeyPress {0}", e.KeyChar);
+
         }
         //protected override bool IsInputKey(Keys keyData)
         //{

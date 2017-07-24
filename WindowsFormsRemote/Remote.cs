@@ -202,7 +202,7 @@ namespace WindowsFormsRemote
 #endif
         private void Remote_Load(object sender, EventArgs e)
         {
-            pad = new Pad(this);
+            pad = new Pad();
             this.textBox_ip.Text = "192.168.0.3";
             //this.textBox_ip.Text = "localhost";
 
