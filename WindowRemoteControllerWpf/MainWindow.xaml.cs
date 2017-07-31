@@ -31,6 +31,7 @@ namespace WindowRemoteControllerWpf
 		}
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			this.address.Text = "192.168.0.3";
 
 		}
 
@@ -124,6 +125,22 @@ namespace WindowRemoteControllerWpf
 				
 		}
 
+		private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+		{
+			Debug("Window_PreviewKeyDown");
+
+		}
+
+		private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+		{
+			Debug("Window_PreviewKeyUp");
+		}
+		private void Rectangle_PreviewKeyDown(object sender, KeyEventArgs e)
+		{
+			e.Handled = true;
+			Debug("Rectangle_PreviewKeyDown");
+		}
+		
 		
 	}
 }
