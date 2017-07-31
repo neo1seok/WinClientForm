@@ -1,0 +1,14 @@
+﻿<Window x:Class="WindowRemoteControllerWpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="552.985" Width="814.552" Background="#FF4B2121" Loaded="Window_Loaded" KeyDown="Process_KeyDown" KeyUp="Process_KeyUp">
+	<Grid Background="#FF615656"  >
+		<Rectangle Fill="#FF49495D" HorizontalAlignment="Left" Height="447" Margin="10,66,0,0" Stroke="Black" VerticalAlignment="Top" Width="787"
+				   MouseWheel="Process_MouseWheel" MouseUp="Process_MouseUp" MouseMove="Process_MouseMove" MouseLeftButtonDown="Process_MouseLeftButtonDown" MouseRightButtonDown="Process_MouseRightButtonDown" MouseLeftButtonUp="Process_MouseLeftButtonUp" MouseRightButtonUp="Process_MouseRightButtonUp" MouseDown="Process_MouseDown" Loaded="Process_Loaded"
+				   />
+		<TextBox HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="327"/>
+		<Button x:Name="btn_start" Content="시작" HorizontalAlignment="Left" Height="30" Margin="498,10,0,0" VerticalAlignment="Top" Width="131" Click="btn_start_Click" />
+		<Button Content="마우스센터이동" HorizontalAlignment="Left" Height="30" Margin="651,10,0,0" VerticalAlignment="Top" Width="146"/>
+
+	</Grid>
+</Window>
